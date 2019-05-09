@@ -318,10 +318,8 @@ f.Visible = 'on';
         if(UseData)
             FeaturesNbr= sum(SelectedFeatures(:,1));
             [data,target,fs]= PrepareData(SpeechDirectory,SpeakerName,TrackName,FrameWidth,FrameInc,Persons,Tracks,SelectedFeatures,FeaturesNbr);
-            Net= BuildNetwork(NetworkDesign,data,target,NetworkFunction,LayersFunction,Gradient,UseGpu,0.9999);
+            [Net,trainingTime]= BuildNetwork(NetworkDesign,data,target,NetworkFunction,LayersFunction,Gradient,UseGpu,0.9999);
             set(TestCheckBox,'enable','on');
-            set(TestFileField,'enable','on');
-            set(SelectTestFileBtn,'enable','on');
             set(RecognizeBtn,'enable','on');
             set(TestDirField,'enable','on');
             set(SelectTestDirBtn,'enable','on');
@@ -329,6 +327,7 @@ f.Visible = 'on';
             set(TestTracksField,'enable','on');
             set(TestBtn,'enable','on');
             assignin('base',NetworkName,Net);
+            assignin('base',[NetworkName,'TrainingTime'],trainingTime);
         end;
     end
 
@@ -357,8 +356,9 @@ f.Visible = 'on';
     function RecognizeBtnCallback(source,eventdata)
         FeaturesNbr= sum(SelectedFeatures(:,1));
         if(TestWithData)
-            [id,score]= RecognizeSpeaker(Net,TestFile,FrameWidth,FrameInc,Persons,SelectedFeatures,FeaturesNbr);
+            [id,score,scores]= RecognizeSpeaker(Net,TestFile,FrameWidth,FrameInc,Persons,SelectedFeatures,FeaturesNbr);
             disp(['Person ',num2str(id),' got ',num2str(score)]);
+            disp(scores);
         end;
     end
 
@@ -396,5 +396,9 @@ f.Visible = 'on';
         [accuracy,results]=TestNet(Net,TestDirectory,FrameWidth,FrameInc,Persons,TestPersons,TestTracks,SelectedFeatures,FeaturesNbr);
         PlotResult(results);
         disp(['The Network accuracy is: ',num2str(accuracy)]);
+        pString= num2str(length(TestPersons));
+        tString= num2str(length(TestTracks));
+        assignin('base',[NetworkName,'P',pString,'T',tString,'Accuracy'],accuracy);
+        assignin('base',[NetworkName,'P',pString,'T',tString,'Results'],results);
     end
 end

@@ -1,5 +1,6 @@
-function net= BuildNetwork(design, data, target, neuralTrainFcn, layerFcn, grad, useGpu, targetAccuracy)
+function [net,trainingTime]= BuildNetwork(design, data, target, neuralTrainFcn, layerFcn, grad, useGpu, targetAccuracy)
 
+trainingTime=clock;
 %get design parameters
 [mLayers,~] = size(design);
 if(iscell(data))
@@ -65,7 +66,10 @@ end;
 accuracy=0;
 while accuracy<targetAccuracy
     net= init(net);
+    startTime=clock;
     net= train(net, data, target, 'useGpu', useGpu);
+    endTime=clock;
+    trainingTime=endTime-startTime;
     output= net(data);
     if(iscell(output))
         output= output{1,1};

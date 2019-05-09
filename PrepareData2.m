@@ -1,17 +1,13 @@
 function [data,target,fs]= PrepareData(directory,folder,file,fw,fi,persons, tracks, features,count)
-[~,fs]=audioread([directory,'\001\PDAm01_001_1.wav']);
+[~,fs]=audioread([directory,'\1\Track (1).wav']);
 [~, mPersons]= size(persons);
 [~, mTracks]= size(tracks);
 featuredata= cell(count,mPersons);
 target= cell(1,mPersons);
-listOfPersonFolders=ls(directory);
-listOfPersonFolders=listOfPersonFolders(3:length(listOfPersonFolders),:);
 for i=1:mPersons
     audio= cell(mTracks,1);
-    listOfAudioFiles=ls([directory,'\',listOfPersonFolders(persons(1,i),:)]);
-    listOfAudioFiles=listOfAudioFiles(3:length(listOfAudioFiles),:);
     for j=1:mTracks
-        audio{j,1}= audioread([directory,'\',listOfPersonFolders(persons(1,i),:),'\',listOfAudioFiles(5*tracks(1,j),:)]);
+        audio{j,1}= audioread([directory,'\',num2str(persons(1,i)),'\Track (',num2str(tracks(1,j)),').wav']);
     end;
     audio= cell2mat(audio);
     
@@ -50,13 +46,13 @@ for i=1:mPersons
     end;
     if(features(3,1))
         if(features(3,2))
-            if(features(3,3))
-                feature= melcepst(audio, fs, 'dD', 12, floor(3*log(fs)), fw*fs/1000, fi*fs/1000)';
+            if(feauters(3,3))
+                feature= melcepst(audio, fs, 'dD', 12, floor(3*log(fs)), fw*fs/1000, fi*fs/1000);
             else
-                feature= melcepst(audio, fs, 'd', 12, floor(3*log(fs)), fw*fs/1000, fi*fs/1000)';
+                feature= melcepst(audio, fs, 'd', 12, floor(3*log(fs)), fw*fs/1000, fi*fs/1000);
             end;
         else
-            feature= melcepst(audio, fs, 12, floor(3*log(fs)), fw*fs/1000, fi*fs/1000)';
+            feature= melcepst(audio, fs, 12, floor(3*log(fs)), fw*fs/1000, fi*fs/1000);
         end;
         [~,n]= size(feature);
         featuredata{featureCount,i}= feature;
@@ -74,7 +70,7 @@ end;
 if(count>1)
     data= cell(count,1);
     for i=1:count
-        data{i,1}= cell2mat(featuredata(i,:));
+        data{i,1}= cell2mat(featuredata{i,:});
     end;
 else
     data= cell2mat(featuredata);
